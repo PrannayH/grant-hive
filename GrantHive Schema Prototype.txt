@@ -1,0 +1,34 @@
+Applicant Organisation ->
+	organisation id
+	contact info
+	abstract
+	team_lead ->
+		first_name
+		last_name
+
+Grant Proposal ->
+	proposal_id
+	proposal_title
+	required_budget
+	project_description
+	panel_score //doesn't matter if qualified or not, we store it lol
+
+Grant Program ->
+	program_id
+	program_name
+	approve_date
+	deadline
+	progress
+
+Review ->
+	review_id
+	score
+	review_by_whom
+	review_date
+	comments
+
+Funded Project ->
+	funded_project_id
+	grant_amount
+	funded_by_whom
+	duration
