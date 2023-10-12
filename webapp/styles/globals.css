@@ -1,0 +1,15 @@
+.login{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-uname{
+    display: flex;
+    flex-direction: column;
+}
+
+.login-pword{
+    display: flex;
+    flex-direction: column;
+}

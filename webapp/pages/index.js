@@ -12,10 +12,10 @@ export default function Home() {
 
   return (
     <main>
-      <div className='flex h-screen items-center'>
-        <div className='flex flex-row w-screen justify-center'>
-          <input className='w-2/4 h-12 text-black' onChange={e=>{setQuery(e.target.value)}} value={query}></input>
-          <button className='bg-white ml-1 text-black' onClick={captureQuery}>SEND!</button>
+      <div className='query-global'>
+        <div className='query-box'>
+          <input className='query-input' onChange={e=>{setQuery(e.target.value)}} value={query}></input>
+          <button className='query-send' onClick={captureQuery}>SEND!</button>
         </div>
       </div>
     </main>
