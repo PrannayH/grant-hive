@@ -1,15 +1,116 @@
-.login{
+/* global.css */
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Apply a background color and font styles to the entire page */
+body {
+    background-color: #ffe7e7;
+    font-family: Arial, sans-serif;
+}
+
+/* Style the navbar */
+.navbar {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
+    background-color: #432525;
+    color: white;
+    padding: 15px 20px;
 }
 
-.login-uname{
-    display: flex;
-    flex-direction: column;
+.logo a {
+    color: white;
+    text-decoration: none;
+    font-size: 25px;
+    margin-left: 30%;
 }
 
-.login-pword{
+.login a {
+    background-color:#f5f5f5;
+    color: black;;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-right: 40px ;
+}
+
+.login a:hover {
+    background-color: white;
+    color: black;
+}
+
+/* Style the content section */
+.content {
+    text-align: center;
+    margin-top: 13%;
+    position: relative;
+}
+
+.work-svg {
+    width: 26%;
+    /* Adjust the width as needed */
+    position: absolute;
+    top: 25%;
+    /* Adjust the positioning as needed */
+    left: 5%;
+    /* transform: rotate(-15deg); */
+    /* Rotate the image by 10 degrees */
+    opacity: 90%;
+}
+
+.money-svg {
+    width: 22%;
+    /* Adjust the width as needed */
+    position: absolute;
+    top: 33%;
+    /* Adjust the positioning as needed */
+    right: 5%;
+    transform: rotate(15deg);
+    /* Rotate the image by 10 degrees */
+    opacity: 90%;
+}
+
+
+
+.center-text {
+    font-family: 'Kaushan Script', cursive;
+    /* Use any desired font-family */
+    font-size: 152px;
+    font-weight: bold;
+    color: #333;
+}
+
+.description {
+    font-size: 22px;
+    margin-top: 20px;
+    color: #582626;
+    font-family: 'Courgette', cursive;
+    text-decoration:underline;
+}
+
+.who-are-you {
+    font-size: 24px;
+    margin-top: 30px;
+    color: #333;
+}
+
+.links {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.link {
+    margin: 0 20px;
+    font-size: 18px;
+    text-decoration: none;
+    color: #432525;
+}
+
+.link:hover {
+    text-decoration: underline;
 }
