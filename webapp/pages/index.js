@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 import { useState } from 'react';
 import Link from 'next/link'; // Import Link component for navigation
@@ -6,10 +7,10 @@ export default function Home() {
   return (
     <main>
       <nav className='navbar'>
-        <div className='logo'>
-          <Link href="/">
+        <div className="logo2">
+          <h1>
             GrantHive
-          </Link>
+          </h1>
         </div>
         <div className='login'>
           <Link href="/login">
