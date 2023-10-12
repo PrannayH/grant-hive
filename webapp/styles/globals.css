@@ -1,5 +1,6 @@
 /* global.css */
 /* Reset some default styles */
+
 * {
     margin: 0;
     padding: 0;
@@ -14,6 +15,15 @@ body {
 
 /* Style the navbar */
 .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #432525;
+    color: white;
+    padding: 15px 20px;
+}
+
+.navbar-log {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -113,4 +123,89 @@ body {
 
 .link:hover {
     text-decoration: underline;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-left: -76%
+}
+
+button:hover {
+    background-color: #582626;
+}
+
+.logo2 {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    margin-left: 2%;
+}
+
+.formGroup {
+    margin: 20px;
+    margin-top:10%;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    border: 1px solid #582626;
+    border-radius: 5px;
+}
+
+input::placeholder {
+    color: #999;
+    /* Placeholder text color */
+}
+
+.loginButton {
+    background-color: #432525;
+    color: white;
+    padding: 10px 40px;
+    border: none;
+    font-size: large;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    /* Add a smooth transition effect */
+
+}
+
+.loginContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 539px;
+    background: rgba(255, 231, 231, 0.9) url('log.jpg') left center no-repeat;
+    background-size: 100%;
+    width: 100%;
+}
+
+.llogin {
+    background-color:#ffe7e7;
+    padding: 2% 5%;
+    padding-top: 15%;
+    box-shadow: 0px 0px 10px rgba(0, 0, 5, 0.9);
+    text-align: center;
+    width: 40%;
+    /* Set the container width to 50% of the viewport */
+    height: 100%;
+    /* Fill the entire height of the viewport */
+}
+
+.loginButton:hover {
+    background-color: #582626;
+}
+
+.log-granthive{
+    font-family: 'Kaushan Script', cursive;
+        /* Use any desired font-family */
+        font-size: 60px;
+        font-weight: bold;
+        color:#432525;
+        margin-top:-30%;
+        text-align: center;
+        margin-bottom: 15%;
 }

@@ -19,21 +19,47 @@ function loginPage(){
         }
     }
 
-    return(<div className="main-login">
-        <div className="login">
-            <div className="login-uname">
-                <div>Username:</div>
-                <input onChange={e=>{setUname(e.target.value)}} value={uname}></input>
+    return (
+        <main>
+            <nav className='navbar-log'>
+                <div className="logo2">
+                    <h1>
+                        GrantHive
+                    </h1>
+                </div>
+            </nav>
+            <div className="loginContainer">
+                <div className="llogin">
+                    <h1 className="log-granthive">
+                        GrantHive
+                    </h1>
+                    <div className="formGroup">
+                        <label htmlFor="username">Username:</label>
+                        <input
+                            type="text"
+                            id="username"
+                            placeholder="@"
+                            onChange={e => { setUname(e.target.value) }}
+                            value={uname}
+                        />
+                    </div>
+                    <div className="formGroup">
+                        <label htmlFor="password">Password:</label>
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="****************"
+                            onChange={e => { setPword(e.target.value) }}
+                            value={pword}
+                        />
+                    </div>
+                    <div className="formGroup">
+                        <button className="loginButton" onClick={submitLogin}>Login</button>
+                    </div>
+                </div>
             </div>
-            <div className="login-pword">
-                <div>Password</div>
-                <input onChange={e=>{setPword(e.target.value)}} value={pword}></input>
-            </div>
-            <div>
-                <button onClick={submitLogin}>Login!</button>
-            </div>
-        </div>
-    </div>)
+        </main>
+    )
 }
 
 export default loginPage;
