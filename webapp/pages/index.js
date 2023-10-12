@@ -3,19 +3,6 @@ import { useState } from 'react';
 import Link from 'next/link'; // Import Link component for navigation
 
 export default function Home() {
-  const [query, setQuery] = useState("");
-  const [result, setResult] = useState("");
-
-  const captureQuery = async () => {
-    try {
-      const response = await axios.post('api/processQuery', { query });
-      setResult(response.data);
-    } catch (error) {
-      console.error("Error:", error);
-      setResult("An error occurred."); // Display an error message on failure
-    }
-  }
-
   return (
     <main>
       <nav className='navbar'>
