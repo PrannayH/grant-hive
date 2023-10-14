@@ -35,6 +35,7 @@ CREATE TABLE GrantProgram (
     approval_date DATE,
     deadline DATE,
     progress ENUM('Pending', 'Approved', 'Completed', 'Canceled'),
+    funded_status ENUM('funded', 'not_funded'),
 
     organisation_id INT,
     review_id INT,
@@ -58,6 +59,16 @@ CREATE TABLE FundedProject (
     grant_amount DECIMAL(10, 2),
     funded_by_whom VARCHAR(100),
     fund_duration INT
+);
+
+CREATE TABLE Users(
+	id varchar(511),
+	username varchar(255),
+    pass varchar(511),
+    user_role ENUM('applicant', 'reviewer', 'funder'),
+    
+    role_id int
+    -- add foreign key constraint
 );
 
 ALTER TABLE GrantProgram
@@ -86,10 +97,10 @@ VALUES
     ('Project Proposal 2', 8000.00, 'Description 2', 2); -- program_id should exist in GrantProgram table
 
 -- Assuming organisation_id, review_id, and funded_project_id values exist in ApplicantOrganisation, Review, and FundedProject tables, respectively
-INSERT INTO GrantProgram (program_name, approval_date, deadline, progress, organisation_id, review_id, funded_project_id)
+INSERT INTO GrantProgram (program_name, approval_date, deadline, progress, funded_status, organisation_id, review_id, funded_project_id)
 VALUES
-    ('Program 1', '2023-01-15', '2023-03-31', 'Approved', 1, 1, 1), -- organisation_id, review_id, and funded_project_id should exist in their respective tables
-    ('Program 2', '2023-02-20', '2023-04-15', 'Pending', 2, 2, 2); -- organisation_id, review_id, and funded_project_id should exist in their respective tables
+    ('Program 1', '2023-01-15', '2023-03-31', 'Approved', 'not_funded', 1, 1, 1), -- organisation_id, review_id, and funded_project_id should exist in their respective tables
+    ('Program 2', '2023-02-20', '2023-04-15', 'Pending', 'funded', 2, 2, 2); -- organisation_id, review_id, and funded_project_id should exist in their respective tables
 
 -- Assuming review_id values will be generated automatically (AUTO_INCREMENT)
 INSERT INTO Review (review_score, review_whom, review_date, feedback)
@@ -102,6 +113,12 @@ INSERT INTO FundedProject (grant_amount, funded_by_whom, fund_duration)
 VALUES
     (6000.00, 'Funder 1', 12),
     (9500.00, 'Funder 2', 24);
+    
+INSERT INTO Users (id, username, pass, user_role, role_id) values 
+('qoadncoqnnqencwc', 'boris', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'reviewer', 1),
+('qoadncoqnnqencwc', 'ivan', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'funder', 1),
+('qoadncoqnnqencwc', 'chernov', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'applicant', 1),
+('qoadncoqnnqencwc', 'vera', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'applicant', 2);
 
 SET foreign_key_checks = 1;
 
