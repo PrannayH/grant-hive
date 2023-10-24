@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 const processQuery = async(req, res)=>{
 
     const pool = mysql.createPool({
-        connectionLimit: 1,
+        connectionLimit: 5,
         host: "localhost",
         port: 3306,
         user: "root",

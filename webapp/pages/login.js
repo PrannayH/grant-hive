@@ -14,6 +14,7 @@ function loginPage(){
         console.log("hmmm: "+result.data.auth);
         if(result.data.auth){
             localStorage.setItem("token", result.data.token);
+            localStorage.setItem("loggedInUser", uname)
             console.log(`after login - http://localhost:3000/${result.data.result.user_role}/${result.data.result.role_id}`);
             router.push(`http://localhost:3000/${result.data.result.user_role}/${result.data.result.role_id}`)
         }
