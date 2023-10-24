@@ -10,13 +10,23 @@ function roles(){
     const [actionState, setActionState] = useState("+");
     const [grantType, setGrantType] = useState("program");
     const [fundOpen, setFundOpen] = useState(false)
+
+    const [pfName, setPfName] = useState("");
+    const [pfBudget, setPfBudget] = useState("");
+    const [pfDesc, setPfDesc] = useState("");
+
+    const [rating, setRating] = useState("");
+    const [ratingChange, setRatingChange] = useState(false);
+    const [feedback, setFeedback] = useState("");
+    
+    const [fundAmount, setFundAmount] = useState("");
     let table, table_id;
 
     useEffect(()=>{
         if(router.isReady){
             getData();
         }
-    }, [router.isReady, grantType])
+    }, [router.isReady, grantType, ratingChange])
 
     function evaluateRole(){
         if(role=='funder'){table='fundedproject'; table_id='funded_project_id'}
@@ -33,25 +43,19 @@ function roles(){
         let query;
         if(role=='applicant'){
             if(grantType==='proposal')
-            {query=`select * from
-            (select gp.* from applicantorganisation ao
-            inner join grantproposal gp where gp.proposal_id=ao.proposal_id) derived
-            where derived.proposal_id=${id};`}
+            {query=`select * from grantproposal where organisation_id=${id};`}
             else{query=`select * from
-            (select ao.organisation_id id, ao.organisation_name, ao.abstract, gp.program_name, gp.approval_date, gp.deadline, r.review_score, r.review_whom, r.review_date, r.feedback, fp.grant_amount, fp.funded_by_whom, fp.fund_duration from applicantorganisation ao
-            inner join grantprogram gp on gp.program_id=ao.organisation_id
-            inner join review r on gp.review_id=r.review_id
-            inner join fundedproject fp on gp.funded_project_id=fp.funded_project_id) derived
+            (select gp.program_id id, ao.organisation_name, ao.abstract, gp.program_name, gp.approval_date, gp.deadline, r.review_score, r.review_whom, r.review_date, r.feedback from applicantorganisation ao
+            inner join grantprogram gp on gp.organisation_id=ao.organisation_id
+            inner join review r on gp.review_id=r.review_id) derived
             where derived.id=${id};`}
         }
         if(role=='reviewer'){query=`select * from
-        (select ao.organisation_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, ao.abstract, gp.proposal_title, gp.required_budget, gp.project_description from applicantorganisation ao
-        inner join grantproposal gp on gp.proposal_id=ao.proposal_id) derived;`}
+        (select gp.proposal_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, ao.abstract, gp.proposal_title, gp.required_budget, gp.project_description from applicantorganisation ao
+        inner join grantproposal gp on ao.organisation_id=gp.organisation_id) derived;`}
         if(role=='funder'){query=`select * from
-        (select ao.organisation_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, ao.abstract, gp.proposal_title, gp.required_budget, gp.project_description, gpo.program_name, gpo.approval_date, gpo.deadline, gpo.progress from applicantorganisation ao
-        inner join grantproposal gp on gp.proposal_id=ao.proposal_id
-        inner join grantprogram gpo on gpo.program_id=gp.proposal_id
-        inner join fundedproject fp on fp.funded_project_id=gpo.funded_project_id and gpo.funded_status='not_funded') derived;`}
+        (select ao.program_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, gpo.program_name, gpo.program_budget, gpo.program_description, gpo.approval_date, gpo.deadline, gpo.progress from applicantorganisation ao
+        inner join grantprogram gpo on ao.program_id=gpo.program_id and gpo.funded_status='not_funded') derived;`}
         // const query = `SELECT * FROM ${table} WHERE ${table_id}=${id}`;
         const result = await axios.post(`http://localhost:3000/api/processQuery`, {
             headers: {
@@ -86,6 +90,179 @@ function roles(){
         }
     }
 
+    const setForeignKeyCheck = async(state)=>{
+        const query = `set foreign_key_checks=${state}`;
+        // const mergedquery = query.join(';')+";";
+        const result = await axios.post("http://localhost:3000/api/processQuery", {
+            headers: {
+                "x-access-token": `${localStorage.getItem("token")}`
+            },
+            query: query,
+            id: id,
+            role: role
+        })
+        if(result.data.auth){
+            console.log(`foreign key check set to ${state}`)
+        } else {
+            console.log("foreign key check wawawawa :(")
+        }
+    }
+
+    const submitProposal = async()=>{
+        const query = `insert into grantproposal(proposal_title, required_budget, project_description, organisation_id) values ('${pfName}', ${pfBudget}, '${pfDesc}', ${id})`;
+        // const mergedquery = query.join(';')+";";
+        await setForeignKeyCheck(0);
+        const result = await axios.post("http://localhost:3000/api/processQuery", {
+            headers: {
+                "x-access-token": `${localStorage.getItem("token")}`
+            },
+            query: query,
+            id: id,
+            role: role
+        })
+        if(result.data.auth){
+            console.log("inserted values!")
+        } else {
+            console.log("wawawawa :(")
+        }
+        await setForeignKeyCheck(1);
+        setPfName("")
+        setPfBudget("")
+        setPfDesc("")
+    }
+
+    
+    const rejectProposal = async(item_id)=>{
+        const query = `delete from grantproposal where proposal_id=${item_id};`;
+        console.log(item_id);
+        // const mergedquery = query.join(';')+";";
+        await setForeignKeyCheck(0);
+        const result = await axios.post("http://localhost:3000/api/processQuery", {
+            headers: {
+                "x-access-token": `${localStorage.getItem("token")}`
+            },
+            query: query,
+            id: id,
+            role: role
+        })
+        if(result.data.auth){
+            console.log("rejected proposal!")
+            setRatingChange(!ratingChange);
+        } else {
+            console.log("reject proposal wawawawa :(")
+        }
+        await setForeignKeyCheck(1);
+    }
+    const approveProposal = async(item_id)=>{
+
+        console.log(item_id);
+        // const mergedquery = query.join(';')+";";
+        let proposalInfo;
+        let reviewInfo;
+        let applicantInfo;
+        await setForeignKeyCheck(0);
+
+        const proposalInfoQuery = `select * from grantproposal where proposal_id=${item_id};`;
+        const proposalInfoRes = await axios.post("http://localhost:3000/api/processQuery", {
+            headers: {
+                "x-access-token": `${localStorage.getItem("token")}`
+            },
+            query: proposalInfoQuery,
+            id: id,
+            role: role
+        })
+        if(proposalInfoRes.data.auth){
+            proposalInfo = proposalInfoRes.data.results[0];
+            console.log("got proposalInfoQuery!")
+            console.log(proposalInfo)
+        } else {
+            console.log("proposalInfoQuery wawawawa :(")
+        }
+
+        const insertReviewInfo = `insert into review(review_id, review_score, review_whom, review_date, feedback) values (${proposalInfo['proposal_id']}, ${rating}, '${localStorage.getItem("loggedInUser")}', '2023-01-01', '${feedback}')`;
+        // const mergedquery = query.join(';')+";";
+        const reviewInfoRes = await axios.post("http://localhost:3000/api/processQuery", {
+            headers: {
+                "x-access-token": `${localStorage.getItem("token")}`
+            },
+            query: insertReviewInfo,
+            id: id,
+            role: role
+        })
+        if(reviewInfoRes.data.auth){
+            applicantInfo = reviewInfoRes.data.results[0];
+            console.log("got reviewInfoQuery!")
+            console.log(reviewInfo)
+        } else {
+            console.log("reviewInfoQuery wawawawa :(")
+        }
+        
+        const insertGrantProgram = `insert into grantprogram(program_name, approval_date, deadline, progress, funded_status, organisation_id, review_id) values ('${proposalInfo['proposal_title']}', '2023-01-01', '2023-06-02','Pending','not_funded','${proposalInfo['organisation_id']}', ${proposalInfo['proposal_id']});`;
+        console.log(item_id);
+        // const mergedquery = query.join(';')+";";
+        await setForeignKeyCheck(0);
+        const result = await axios.post("http://localhost:3000/api/processQuery", {
+            headers: {
+                "x-access-token": `${localStorage.getItem("token")}`
+            },
+            query: insertGrantProgram,
+            id: id,
+            role: role
+        })
+        if(result.data.auth){
+            console.log("inserted grant program")
+        } else {
+            console.log("insert grant program wawawawa :(")
+        }
+
+        //remove from grant proposal after approving, bad name because reusing function
+        rejectProposal(item_id);
+        await setForeignKeyCheck(1);
+    }
+
+    const approveFunding = async(program_id, currentBudget)=>{
+        const newFundingQuery = `insert into fundedproject(grant_amount, funded_by_whom, fund_duration, program_id) values (${fundAmount}, '${localStorage.getItem("loggedInUser")}', ${6}, ${program_id})`;
+        // const mergedquery = query.join(';')+";";
+        await setForeignKeyCheck(0);
+        const newFundingRes = await axios.post("http://localhost:3000/api/processQuery", {
+            headers: {
+                "x-access-token": `${localStorage.getItem("token")}`
+            },
+            query: newFundingQuery,
+            id: id,
+            role: role
+        })
+        if(newFundingRes.data.auth){
+            console.log("inserted new funding instance!")
+        } else {
+            console.log("inserted new funding instance wawawawa :(")
+        }
+
+        let updatedBudget = currentBudget - fundAmount;
+        if(updatedBudget<0){updatedBudget=0;}
+        let funded = updatedBudget===0?'funded':'not_funded';
+        console.log("updated budget: ", updatedBudget, "->", currentBudget, "-", fundAmount, "[] funded", funded);
+        const decrementRequiredBudgetQuery = `update grantprogram set program_budget=${updatedBudget}, funded_status='${funded}' where program_id=${program_id}`;
+        // const mergedquery = query.join(';')+";";
+        await setForeignKeyCheck(0);
+        const decrementRequiredBudgetRes = await axios.post("http://localhost:3000/api/processQuery", {
+            headers: {
+                "x-access-token": `${localStorage.getItem("token")}`
+            },
+            query: decrementRequiredBudgetQuery,
+            id: id,
+            role: role
+        })
+        if(decrementRequiredBudgetRes.data.auth){
+            console.log("decremented required budget!")
+        } else {
+            console.log("decremented required budget wawawawa :(")
+        }
+        await setForeignKeyCheck(1);
+        setFundAmount(0);
+        setRatingChange(!ratingChange);
+    }
+    
     return(<div>
         {role === 'applicant' ? (
             <div>
@@ -108,19 +285,28 @@ function roles(){
                                 <div className="input-pair">
                                     <div>Proposal Name :</div>
                                     <div>
-                                        <input type="text" />
+                                        <input type="text"
+                                        onChange={e => { setPfName(e.target.value) }}
+                                        value={pfName}
+                                        />
                                     </div>
                                 </div>
                                 <div className="input-pair">
                                     <div>Required Budget :</div>
                                     <div>
-                                        <input type="text" />
+                                        <input type="text"
+                                        onChange={e => { setPfBudget(e.target.value) }}
+                                        value={pfBudget}
+                                        />
                                     </div>
                                 </div>
                                 <div className="input-pair">
                                     <div>Proposal Description :</div>
                                     <div>
-                                        <textarea rows="4" cols="30" style={{ border: '1px solid black' }}></textarea>
+                                        <textarea rows="4" cols="30" style={{ border: '1px solid black' }}
+                                        onChange={e => { setPfDesc(e.target.value) }}
+                                        value={pfDesc}
+                                        ></textarea>
                                     </div>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -133,7 +319,8 @@ function roles(){
                                         borderRadius: '5px',
                                         fontSize: '12px',
                                         fontWeight: 'bold'
-                                    }}>Submit</button>
+                                    }}
+                                    onClick={submitProposal}>Submit</button>
                                 </div>
                             </div>
 
@@ -169,8 +356,6 @@ function roles(){
                                                 <div className="hmm">Approval date: {item.approval_date}</div>
                                                 <div className="hmm">Feedback: {item.feedback}</div>
                                                 <div className="hmm">Deadline: {item.deadline}</div>
-                                                <div className="hmm">Funded By: {item.funded_by_whom}</div>
-                                                <div className="hmm">Fund Duration: {item.fund_duration}</div>
                                                 <div className="hmm">Review Date: {item.review_date}</div>
                                                 <div className="hmm">Reviewed By: {item.review_whom}</div>
                                                 <div className="hmm">Review Score: {item.review_score}</div>
@@ -217,11 +402,19 @@ function roles(){
                                 <div className="rev-details">
                                     <div className="rev-detail">
                                         <label className="rev-lab" htmlFor="rating">Enter Rating</label>
-                                        <input type="number" id="rating" min="1" max="5" step="0.1" />
+                                        <input type="number" id="rating" min="1" max="5" step="0.1"
+                                        onChange={e => { setRating(e.target.value) }}
+                                        value={rating}/>
+                                    </div>
+                                    <div>
+                                        <label>Enter Feedback</label>
+                                        <input type="text"
+                                        onChange={e => { setFeedback(e.target.value); }}
+                                        value={feedback}/>
                                     </div>
                                     <div className="rev-actions">
-                                        <button className="approve-button">Approve</button>
-                                        <button className="reject-button">Reject</button>
+                                        <button className="approve-button" onClick={()=>{approveProposal(item.id)}}>Approve</button>
+                                        <button className="reject-button" onClick={()=>{rejectProposal(item.id)}}>Reject</button>
                                     </div>
                                 </div>
                             </div>
@@ -252,11 +445,10 @@ function roles(){
                                 <div className="hm">Program ID: {item.id}</div>
                                 <div className="hm">Organisation Name: {item.organisation_name}</div>
                                 <div className="hm">Team Leader: {item.team_lead_fname} {item.team_lead_lname}</div>
-                                <div className="hm">Proposal Title: {item.proposal_title}</div>                                                             
-                                <div className="hm">Program Name: {item.program_name}</div>
+                                <div className="hm">Program Name: {item.program_name}</div>                                                             
+                                <div className="hm">Current Required Budget: {item.program_budget}</div>
                                 {/* <div className="hm">Abstract: {item.abstract}</div> */}
-                                <div className="hm">Project Description: {item.project_description}</div>
-                                <div className="hm">Required Budget: {item.required_budget}</div>
+                                <div className="hm">Project Description: {item.program_description}</div>
                                 <div className="hm">Approval Date: {item.approval_date}</div>
                                 <div className="hm">Deadline: {item.deadline}</div>
                                 <div className="hm">Progress: {item.progress}</div>
@@ -267,13 +459,11 @@ function roles(){
                                         <div className="fund-form">
                                             <div className="set-amount-label">Set Amount</div>
                                             <div className="set-amount-input">
-                                                <input type="text" />
+                                                <input type="number" onChange={e => { setFundAmount(e.target.value) }} value={fundAmount}/>
                                             </div>
-                                            <button className="approve1-button">Approve</button>
+                                            <button className="approve1-button" onClick={()=>{approveFunding(item.id, item.program_budget)}}>Approve</button>
                                         </div>
-                                    ) : (
-                                        <button className="reject1-button">Reject</button>
-                                    )}
+                                    ) : <div></div>}
                                 </div>
                             </div>
                         ))}
