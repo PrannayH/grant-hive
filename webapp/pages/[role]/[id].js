@@ -10,16 +10,22 @@ function roles(){
     const [actionState, setActionState] = useState("+");
     const [grantType, setGrantType] = useState("program");
     const [fundOpen, setFundOpen] = useState(false)
+    const [viewFunder, setViewFunder] = useState("close")
+    const [viewFunderResult, setViewFunderResult] = useState([]);
+    const [whichProgram, setWhichProgram] = useState();
 
     const [pfName, setPfName] = useState("");
     const [pfBudget, setPfBudget] = useState("");
     const [pfDesc, setPfDesc] = useState("");
 
-    const [rating, setRating] = useState("");
+    const [rating, setRating] = useState([]);
     const [ratingChange, setRatingChange] = useState(false);
     const [feedback, setFeedback] = useState("");
     
     const [fundAmount, setFundAmount] = useState("");
+    
+    const [whoChange, setWhoChange] = useState();
+
     let table, table_id;
 
     useEffect(()=>{
@@ -33,6 +39,10 @@ function roles(){
         if(role=='applicant'){table='applicantorganisation'; table_id='organisation_id'}
         if(role=='reviewer'){table='review'; table_id='review_id'}
     }
+
+    // const updateRating = (index, value)=>{
+    //     if(rating[index])
+    // }
 
     //get data based on role - 
     //applicant - grant proposal | grant programs + review rating + funding amount (use inner join on all for query)
@@ -48,13 +58,14 @@ function roles(){
             (select ao.organisation_id id, ao.organisation_name, gp.program_description, gp.program_budget, gp.program_name, gp.approval_date, gp.deadline, r.review_score, r.review_whom, r.review_date, r.feedback from applicantorganisation ao
             inner join grantprogram gp on gp.organisation_id=ao.organisation_id
             inner join review r on gp.review_id=r.review_id) derived
-            where derived.id=${id};`}
+            where derived.id=${id};`
+            }
         }
         if(role=='reviewer'){query=`select * from
         (select gp.proposal_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, ao.abstract, gp.proposal_title, gp.required_budget, gp.project_description from applicantorganisation ao
         inner join grantproposal gp on ao.organisation_id=gp.organisation_id) derived;`}
         if(role=='funder'){query=`select * from
-        (select ao.organisation_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, gpo.program_name, gpo.program_budget, gpo.program_description, gpo.approval_date, gpo.deadline, gpo.progress from applicantorganisation ao
+        (select gpo.program_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, gpo.program_name, gpo.program_budget, gpo.program_description, gpo.approval_date, gpo.deadline, gpo.progress from applicantorganisation ao
         inner join grantprogram gpo on ao.organisation_id=gpo.organisation_id and gpo.funded_status='not_funded') derived;`}
         // const query = `SELECT * FROM ${table} WHERE ${table_id}=${id}`;
         const result = await axios.post(`http://localhost:3000/api/processQuery`, {
@@ -72,6 +83,28 @@ function roles(){
             console.log("get banished to homepage!")
             router.push(`http://localhost:3000`)
         }
+
+        if(viewFunder==='open'){
+            let funderQuery=`select grant_amount, funded_by_whom, fund_duration from fundedproject where program_id=${whichProgram};`
+            const viewFunderResult = await axios.post(`http://localhost:3000/api/processQuery`, {
+                headers: {
+                    "x-access-token": `${localStorage.getItem("token")}`
+                },
+                query: query,
+                id: id,
+                role: role})
+            if(viewFunderResult.data.auth){
+                console.log("view funder data now")
+                console.log(viewFunderResult.data.results)
+                setViewFunderResult(viewFunderResult.data.results)
+            } else {
+                console.log("view funder data wawawawa :(")
+            }
+        } else {
+            funderQuery = "";
+        }
+
+
     }
 
 
@@ -90,6 +123,16 @@ function roles(){
         } else {
             setGrantType("proposal")
         }
+    }
+
+    const toggleViewFunder = (who)=>{
+        if(viewFunder==="open"){
+            setViewFunder("close")
+        } else {
+            setViewFunder("open")
+        }
+
+        setWhichProgram(who)
     }
 
     const setForeignKeyCheck = async(state)=>{
@@ -356,23 +399,29 @@ function roles(){
                                     <div>
                                         {queryResult.map((item, index) => (
                                             <div key={index} className="program-item1">
-                                            <div className="arrange">
-                                                <div className="left">
-                                                <div className="hmm"><span className="oh">ID:</span> {item.id}</div>
-                                                <div className="hmm"><span className="oh">Required Budget:</span> {item.program_budget}</div> 
-                                                <div className="hmm"><span className="oh">Organisation Name:</span> {item.organisation_name}</div>
-                                                <div className="hmm"><span className="oh">Program Name:</span> {item.program_name}</div>
-                                                <div className="hmm"><span className="oh">Program Desc:</span> {item.program_description}</div>                                                
-                                                <div className="hmm"><span className="oh">Feedback:</span> {item.feedback}</div>
+                                                <div className="arrange">
+                                                        <div className="left">
+                                                        <div className="hmm"><span className="oh">ID:</span> {item.id}</div>
+                                                        <div className="hmm"><span className="oh">Required Budget:</span> {item.program_budget}</div> 
+                                                        <div className="hmm"><span className="oh">Organisation Name:</span> {item.organisation_name}</div>
+                                                        <div className="hmm"><span className="oh">Program Name:</span> {item.program_name}</div>
+                                                        <div className="hmm"><span className="oh">Program Desc:</span> {item.program_description}</div>                                                
+                                                        <div className="hmm"><span className="oh">Feedback:</span> {item.feedback}</div>
+                                                    </div>
+                                                    <div className="right">
+                                                        <div className="hmm"><span className="oh">Approval Date:</span> {item.approval_date ? new Date(item.approval_date).toISOString().split('T')[0] : ''}</div>
+                                                        <div className="hmm"><span className="oh">Deadline:</span> {item.deadline ? new Date(item.deadline).toISOString().split('T')[0] : ''}</div>
+                                                        <div className="hmm"><span className="oh">Review Date:</span> {item.review_date ? new Date(item.review_date).toISOString().split('T')[0] : ''}</div>
+                                                        <div className="hmm"><span className="oh">Reviewed By:</span> {item.review_whom}</div>
+                                                        <div className="hmm"><span className="oh">Review Score:</span> {item.review_score}</div>
+                                                    </div>
                                                 </div>
-                                                <div className="right">
-                                                <div className="hmm"><span className="oh">Approval Date:</span> {item.approval_date ? new Date(item.approval_date).toISOString().split('T')[0] : ''}</div>
-                                                <div className="hmm"><span className="oh">Deadline:</span> {item.deadline ? new Date(item.deadline).toISOString().split('T')[0] : ''}</div>
-                                                <div className="hmm"><span className="oh">Review Date:</span> {item.review_date ? new Date(item.review_date).toISOString().split('T')[0] : ''}</div>
-                                                <div className="hmm"><span className="oh">Reviewed By:</span> {item.review_whom}</div>
-                                                <div className="hmm"><span className="oh">Review Score:</span> {item.review_score}</div>
+                                                <div>
+                                                    <button onClick={()=>{toggleViewFunder(item.id)}}>View Funders</button>
+                                                    <div>
+                                                        <div>use map and put funder detail here in a table</div>
+                                                    </div>
                                                 </div>
-                                            </div>
                                             </div>
                                         ))}
                                     </div>
@@ -425,18 +474,18 @@ function roles(){
                                     <div className="rev-detail">
                                         <label className="rev-lab" htmlFor="rating">Enter Rating</label>
                                         <input type="number" id="rating" min="1" max="5" step="0.1"
-                                        onChange={e => { setRating(e.target.value) }}
-                                        value={rating}/>
+                                        onChange={e => { setRating(e.target.value); setWhoChange(index) }}
+                                        value={whoChange===index?rating:""}/>
                                     </div>
                                     <div>
                                         <label style={{margin:'0 0 0 0px'}}>Enter Feedback</label>
                                         <input type="text"
-                                        onChange={e => { setFeedback(e.target.value); }}
-                                        value={feedback}/>
+                                        onChange={e => { setFeedback(e.target.value); setWhoChange(index) }}
+                                        value={whoChange===index?feedback:""}/>
                                     </div>
                                     <div className="rev-actions">
-                                        <button className="approve-button" onClick={()=>{approveProposal(item.id)}}>Approve</button>
-                                        <button className="reject-button" onClick={()=>{rejectProposal(item.id)}}>Reject</button>
+                                        <button className="approve-button" onClick={()=>{approveProposal(item.id);setWhoChange(-1)}}>Approve</button>
+                                        <button className="reject-button" onClick={()=>{rejectProposal(item.id);setWhoChange(-1)}}>Reject</button>
                                     </div>
                                 </div>
                             </div>
@@ -488,14 +537,16 @@ function roles(){
                                     <div className="hm"><span className="oh">Progress:</span> {item.progress}</div>
                                 </div>
                                 <div className="grant-program-actions">
-                                    <button className="fund-button" onClick={() => { setFundOpen(!fundOpen) }}>Want to Fund?</button>
-                                    {fundOpen ? (
+                                    <button className="fund-button" onClick={() => { setFundOpen(!fundOpen); setWhoChange(index) }}>Want to Fund?</button>
+                                    {(fundOpen&&index===whoChange) ? (
                                         <div className="fund-form">
                                             <div className="set-amount-label">Set Amount</div>
                                             <div className="set-amount-input">
-                                                <input type="number" onChange={e => { setFundAmount(e.target.value) }} value={fundAmount}/>
+                                                <input type="number" 
+                                                onChange={e => { setFundAmount(e.target.value); setWhoChange(index) }}
+                                                value={whoChange===index?fundAmount:""}/>
                                             </div>
-                                            <button className="approve1-button" onClick={()=>{approveFunding(item.id, item.program_budget)}}>Approve</button>
+                                            <button className="approve1-button" onClick={()=>{approveFunding(item.id, item.program_budget);setWhoChange(-1)}}>Approve</button>
                                             
                                         </div>
                                     ) : <div></div>}

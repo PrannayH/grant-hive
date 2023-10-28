@@ -121,7 +121,8 @@ INSERT INTO Users (id, username, pass, user_role, role_id) values
 ('qoadncoqnnqencwc', 'boris', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'reviewer', 1),
 ('qoadncoqnnqencwc', 'ivan', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'funder', 1),
 ('qoadncoqnnqencwc', 'chernov', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'applicant', 1),
-('qoadncoqnnqencwc', 'vera', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'applicant', 2);
+('qoadncoqnnqencwc', 'vera', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'applicant', 2),
+('qoadncoqnnqencwc', 'pyotr', '$2a$10$rkpOftoRiobOcE6v6eXjdO/0HAXD.dDj1dDIY.sNewwFsJqfGd.l2', 'funder', 2);
 
 SET foreign_key_checks = 1;
 
