@@ -23,7 +23,8 @@ function loginPage(){
     return (
         <main>
             <nav className='navbar-log'>
-                <div className="logo2">
+                <img src="/GH.svg" alt="Your SVG" className="gh-svg" />
+                <div className="logo2" style={{ margin: "0 46% 0 0" }}>
                     <h1>
                         GrantHive
                     </h1>

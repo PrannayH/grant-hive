@@ -100,9 +100,9 @@ function roles(){
             } else {
                 console.log("view funder data wawawawa :(")
             }
-        } else {
-            funderQuery = "";
-        }
+         } //else {
+        //     funderQuery = "";
+        // }
 
 
     }
@@ -312,7 +312,8 @@ function roles(){
         {role === 'applicant' ? (
             <div>
                 <nav className="navbar-log">
-                    <div className="logo2">
+                    <img src="/GH.svg" alt="Your SVG" className="gh-svg" />
+                    <div className="logoo">
                         <h1>GrantHive</h1>
                     </div>
                     <div className='login'>
@@ -323,17 +324,20 @@ function roles(){
                 </nav>
                 <div>
                     <div className="user-greeting">Hello <span>{localStorage.getItem("loggedInUser")}</span>!</div>
+                    <img src="/form.svg" alt="Your SVG" className="form-svg" />
                     <button className="toggle-button" onClick={toggleActionState}>
                         {actionState}
                     </button>
+                   
+
                     <img src="/app.svg" alt="Your SVG" className="app-svg" />
                 </div>
                 <div>
                     {actionState === "x" ? (
                         <div className="proposal-form">
-                            <div style={{ fontSize: '20px', textAlign: 'center', margin: '1% auto', fontWeight: 'bold', color:'#703131' }}>Create Grant Proposal</div>
-                            <div style={{ marginTop: '3%' }}>
-                                <div className="input-pair">
+                            <div style={{ fontSize: '20px', textAlign: 'center', margin: '2% auto', fontWeight: 'bold', color:'#703131' }}>Create Grant Proposal</div>
+                            <div style={{ marginTop: '4%' }}>
+                                <div className="input-pair" style={{ marginBottom: '-10px' }}>
                                     <div>Proposal Name :</div>
                                     <div>
                                         <input type="text" style={{padding:'3%'}}
@@ -354,7 +358,7 @@ function roles(){
                                 <div className="input-pair">
                                     <div>Proposal Description :</div>
                                     <div>
-                                        <textarea rows="4" cols="30" style={{ padding:'3%' , border: '1px solid black' }}
+                                        <textarea rows="3" cols="30" style={{ padding:'3%' , border: '1px solid black' }}
                                         onChange={e => { setPfDesc(e.target.value) }}
                                         value={pfDesc}
                                         ></textarea>
@@ -417,10 +421,10 @@ function roles(){
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <button onClick={()=>{toggleViewFunder(item.id)}}>View Funders</button>
+                                                    {/* <button className="view-funder" onClick={()=>{toggleViewFunder(item.id)}}>View Funders</button>
                                                     <div>
                                                         <div>use map and put funder detail here in a table</div>
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                             </div>
                                         ))}
@@ -436,7 +440,8 @@ function roles(){
 
         {role=='reviewer'?<div>
             <nav className='navbar-log'>
-                <div className="logo2">
+                <img src="/GH.svg" alt="Your SVG" className="gh-svg" />
+                <div className="logoo">
                     <h1>
                         GrantHive
                     </h1>
@@ -455,9 +460,13 @@ function roles(){
             <div className="rev-container">
                 {/* Display the program items with buttons on the right */}
                 <div className="rev-info">
+                <div className="rev-h">
                     <div className="revtit">
-                        PENDING PROGRAM(S) TO BE REVIEWED
+                        PENDING PROPOSAL(S) TO BE REVIEWED
                     </div>
+                    <img src="/stars.svg" alt="Your SVG" className="stars-svg" />
+                    
+                </div>
                     {queryResult.map((item, index) => (
                         <div key={index} className="rev-item">
                             <div className="aa">
@@ -472,10 +481,27 @@ function roles(){
                             <div className="rev-content">
                                 <div className="rev-details">
                                     <div className="rev-detail">
-                                        <label className="rev-lab" htmlFor="rating">Enter Rating</label>
-                                        <input type="number" id="rating" min="1" max="5" step="0.1"
-                                        onChange={e => { setRating(e.target.value); setWhoChange(index) }}
-                                        value={whoChange===index?rating:""}/>
+                                        <label className="rev-lab" htmlFor="rating">Enter Rating (0-5)</label>
+                                        <input
+                                            type="number"
+                                            id="rating"
+                                            min="1"
+                                            max="5"
+                                            step="0.5"
+                                            onChange={(e) => {
+                                                const inputValue = parseFloat(e.target.value);
+
+                                                // Check if the input value is greater than 5 and set it to 5 if it is.
+                                                if (inputValue > 5) {
+                                                    e.target.value = '5';
+                                                }
+
+                                                setRating(e.target.value);
+                                                setWhoChange(index);
+                                            }}
+                                            value={whoChange === index ? rating : ''}
+                                        />
+
                                     </div>
                                     <div>
                                         <label style={{margin:'0 0 0 0px'}}>Enter Feedback</label>
@@ -500,7 +526,8 @@ function roles(){
         {role === 'funder' ? (
             <div>
                 <nav className='navbar-log'>
-                    <div className="logo2">
+                    <img src="/GH.svg" alt="Your SVG" className="gh-svg" />
+                    <div className="logoo">
                         <h1>GrantHive</h1>
                     </div>
                     <div className='login'>
@@ -522,6 +549,7 @@ function roles(){
                         <div className="fundtit">
                             PENDING PROGRAM(S) TO BE FUNDED
                         </div>
+                        <img src="/mani.svg" alt="Your SVG" className="mani-svg" />
                         {queryResult.map((item, index) => (
                             <div key={index} className="program-item">
                                 <div className = "aa">
@@ -532,8 +560,8 @@ function roles(){
                                     <div className="hm"><span className="oh">Current Required Budget:</span> {item.program_budget}</div>
                                 {/* <div className="hm">Abstract: {item.abstract}</div> */}
                                     <div className="hm"><span className="oh">Project Description:</span> {item.program_description}</div>
-                                    <div className="hm"><span className="oh">Approval Date:</span> {item.approval_date}</div>
-                                    <div className="hm"><span className="oh">Deadline:</span> {item.deadline}</div>
+                                    <div className="hm"><span className="oh">Approval Date:</span> {item.approval_date ? new Date(item.approval_date).toISOString().split('T')[0] : ''}</div>
+                                    <div className="hm"><span className="oh">Deadline:</span> {item.deadline ? new Date(item.deadline).toISOString().split('T')[0] : ''}</div>
                                     <div className="hm"><span className="oh">Progress:</span> {item.progress}</div>
                                 </div>
                                 <div className="grant-program-actions">
@@ -559,7 +587,8 @@ function roles(){
         ) : (
             <div></div>
         )}
-
+        
+        
 
     </div>)
 }

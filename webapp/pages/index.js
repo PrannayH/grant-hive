@@ -6,8 +6,9 @@ import Link from 'next/link'; // Import Link component for navigation
 export default function Home() {
   return (
     <main>
-      <nav className='navbar'>
-        <div className="logo2">
+      <nav className='navbar-log'>
+        <img src="/GH.svg" alt="Your SVG" className="gh-svg" />
+        <div className="logoo" style={{margin: "0 0 0 2%"}}>
           <h1>
             GrantHive
           </h1>

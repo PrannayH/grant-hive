@@ -7,11 +7,9 @@
     box-sizing: border-box;
 }
 
-
-
 /* Apply a background color and font styles to the entire page */
 body {
-    background-color: #ffe7e7;
+    background-color: #fce4e4;
     font-family: Arial, sans-serif;
 }
 
@@ -31,7 +29,7 @@ body {
     align-items: center;
     background-color: #432525;
     color: white;
-    padding: 15px 20px;
+    padding: 10px 20px;
 }
 
 .logo a {
@@ -50,6 +48,8 @@ body {
     margin-right: 40px;
 }
 
+
+
 .login a:hover {
     background-color: white;
     color: black;
@@ -60,6 +60,38 @@ body {
     text-align: center;
     margin-top: 13%;
     position: relative;
+}
+
+.gh-svg{
+    width : 2.5%;
+    background:#401a1a;
+    padding: 0 0 0 0;
+    margin: 0 0 0 2%;
+}
+
+.stars-svg{
+    width:10%;
+    margin: 0 0 0 2%;    
+}
+
+.stars-svg:hover{
+    width:11%;
+}
+
+.form-svg{
+    width:4%;
+    margin: 0 0 -1.5% 20%;
+}
+
+.mani-svg{
+    width:8%;
+    margin: -5.5% 0 0 14%;
+}
+
+.rev-h{
+    display: flex;
+    flex-direction: row;
+    margin: 0 0 0 5%;
 }
 
 .work-svg {
@@ -86,6 +118,13 @@ body {
     opacity: 90%;
 }
 
+.fund-svg:hover{
+    width:22%;
+    position: absolute;
+    top: 16%;
+
+}
+
 .rev-svg{
     width: 25%;
     /* Adjust the width as needed */
@@ -100,29 +139,39 @@ body {
 
 }
 
+
 .app-svg {
     width: 20%;
     /* Adjust the width as needed */
     position: absolute;
-    top: 24%;
+    top: 19%;
     /* Adjust the positioning as needed */
-    right: 15%;
+    right: 12%;
     /* transform: rotate(15deg); */
     /* Rotate the image by 10 degrees */
     opacity: 100%;
+}
 
+.app-svg:hover{
+    width:22%;
+    position: absolute;
+    top:18%;
+    right: 11%;
+    padding: 0 0 
 }
 
 .fundtit{
      margin:3% 0 0 25%;
      font-weight: 700;
      color: #401a1a;
+     text-decoration: underline;
 }
 
 .revtit {
-    margin: 3% 0 5% 25%;
+    margin: 3% 0 5% 20%;
     font-weight: 700;
     color: #401a1a;
+    text-decoration: underline;
 }
 
 .fund-svg{
@@ -191,7 +240,14 @@ button:hover {
     color: white;
     text-decoration: none;
     font-size: 15px;
-    margin-left: 2%;
+    margin: 0 46% 0 0;
+}
+
+.logoo{
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    margin: 0 0 0 6%;
 }
 
 .formGroup {
@@ -229,7 +285,7 @@ input::placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 90.5vh;
+    height: 90.55vh;
     background: rgba(255, 231, 231, 0.9) url('log.jpg') left center no-repeat;
     background-size: 100%;
     width: 100%;
@@ -243,12 +299,13 @@ input::placeholder {
     text-align: center;
     width: 35%;
     /* Set the container width to 50% of the viewport */
-    height: 90.5vh;
+    height: 90.55vh;
     /* Fill the entire height of the viewport */
 }
 
 .loginButton:hover {
     background-color: #582626;
+
 }
 
 .log-granthive{
@@ -286,6 +343,20 @@ input::placeholder {
     text-shadow: #333;
 }
 
+.view-funder{
+    background-color: #582626;
+    color: #ddd;
+    margin: 2% 0 1% 5%;
+    padding:0.5% 1.5%;
+    border: 1.5px solid #582626;
+    border-radius: 5%;
+}
+
+.view-funder:hover{
+    background-color:#6c3434;
+    cursor: pointer;
+}
+
 .user-greeting-fund {
     font-family: 'Kaushan Script', cursive;
     /* Use any desired font-family */
@@ -309,10 +380,11 @@ span{
     padding: 10px 20px;
     border: none;
     cursor: pointer;
-    margin-left:20%;
+    margin-left:0.5%;
     margin-top:1%;
     box-shadow: 0 0 40px rgba(171, 44, 44, 0.425);
     text-align: center;
+    border-radius: 10%;
     
 }
 
@@ -321,7 +393,7 @@ span{
 }
 
 .proposal-form {
-    margin: 1% 0 0% 20%;
+    margin: 1% 0 1% 20%;
     padding: 20px 90px;
     border: 2px solid rgb(77, 42, 42);
     background-color: #f9f9f9;
@@ -353,6 +425,7 @@ span{
     margin-top: 4%;
     border-bottom: 1px solid black;
     padding: 0 0 1.5% 0;
+       
 }
 
 .existing-data {
@@ -368,6 +441,7 @@ span{
 .arrange{
     display: flex;
     flex-direction: row;
+    padding-bottom: 2%;
 }
 
 .right{
@@ -381,10 +455,11 @@ span{
 .toggle-data-button {
   background-color:#582626;
   color: #fff;
-  padding: 10px 10px;
+  padding: 10px 20px;
   border: none;
   cursor: pointer;
   margin-left: 37%;
+  border-radius: 5%;
 }
 
 .toggle-data-button:hover {
@@ -401,7 +476,7 @@ span{
 .input-pair {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .input-pair div {
@@ -467,7 +542,7 @@ span{
     color: white;
     border: none;
     padding: 10px 20px;
-    margin: 5% 0 0 0;
+    margin: 13% 0 0 0;
     cursor: pointer;
     border-radius: 5px;
 }
@@ -488,8 +563,8 @@ span{
 }
 
 .set-amount-input {
-    margin: 0 0 0 80%;
-    width: 50%
+    margin: 0 0 0 115%;
+    width: 70%
 }
 
 .approve1-button {
@@ -497,7 +572,7 @@ span{
     color: white;
     border: none;
     padding: 10px 20px;
-    margin: 0 0;
+    margin: 0 0 0 5px;
     cursor: pointer;
     border-radius: 5px;
 }
@@ -527,8 +602,9 @@ span{
     justify-content: space-between;
     align-items: center;
     /* border: 1px solid #ccc; */
-    padding: 10px;
-    margin: 0 0;
+    padding: 3% 6%;
+    margin: 3% 0;
+    box-shadow: 0 0 2px black;
 }
 
 .rev-item{
@@ -537,8 +613,9 @@ span{
     justify-content: space-between;
     align-items: center;
     /* border: 1px solid #ccc; */
-    padding: 10px;
+    padding: 2% 5%;
     margin: 0 0;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.6);
 }
 
 /* Style the "Want to Fund" and "Reject" buttons */
@@ -564,7 +641,7 @@ span{
     flex-direction: column;
     align-items: center;
     border: 1px solid black;
-    padding: 2% 4%;
+    padding: 2% 1%;
     /* margin-top: 5%;
     margin-left: 20%;
     margin-bottom: 2%; */
@@ -573,6 +650,10 @@ span{
     background-color: #f7f7f7;
     border-radius: 5px;
     box-shadow: 0 0 50px rgba(171, 44, 44, 0.425);
+}
+
+.rev-content:hover{
+    box-shadow: 0px 0px 20px rgba(15, 15, 15, 0.166);
 }
 
 .rev-info {
@@ -599,7 +680,7 @@ span{
     margin-left: 10%;
     padding: 3%;
     padding-left:3%;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 40%;
 }
@@ -660,7 +741,7 @@ input[type="number"] {
 
 .reject-button {
     padding: 5px 20px;
-    background: #007acc;
+    background: rgb(187, 69, 69);
     color: #fff;
     border: none;
     cursor: pointer;
@@ -689,7 +770,7 @@ input[type="number"] {
 
 .approve-button{
         padding: 5px 20px;
-        background: #007acc;
+        background: rgb(70, 180, 70);
         color: #fff;
         border: none;
         cursor: pointer;
@@ -704,7 +785,10 @@ input[type="number"] {
     border-bottom: 2px colid black;
 }
 
-.approve-button:hover,
+.approve-button:hover{
+    background-color: rgb(2, 176, 2);
+}
+
 .reject-button:hover {
-    background: #005fa5;
+    background: rgb(213, 47, 47);
 }
