@@ -10,16 +10,22 @@ function roles(){
     const [actionState, setActionState] = useState("+");
     const [grantType, setGrantType] = useState("program");
     const [fundOpen, setFundOpen] = useState(false)
+    const [viewFunder, setViewFunder] = useState("close")
+    const [viewFunderResult, setViewFunderResult] = useState([]);
+    const [whichProgram, setWhichProgram] = useState();
 
     const [pfName, setPfName] = useState("");
     const [pfBudget, setPfBudget] = useState("");
     const [pfDesc, setPfDesc] = useState("");
 
-    const [rating, setRating] = useState("");
+    const [rating, setRating] = useState([]);
     const [ratingChange, setRatingChange] = useState(false);
     const [feedback, setFeedback] = useState("");
     
     const [fundAmount, setFundAmount] = useState("");
+    
+    const [whoChange, setWhoChange] = useState();
+
     let table, table_id;
 
     useEffect(()=>{
@@ -34,6 +40,10 @@ function roles(){
         if(role=='reviewer'){table='review'; table_id='review_id'}
     }
 
+    // const updateRating = (index, value)=>{
+    //     if(rating[index])
+    // }
+
     //get data based on role - 
     //applicant - grant proposal | grant programs + review rating + funding amount (use inner join on all for query)
     //
@@ -45,17 +55,18 @@ function roles(){
             if(grantType==='proposal')
             {query=`select * from grantproposal where organisation_id=${id};`}
             else{query=`select * from
-            (select gp.program_id id, ao.organisation_name, ao.abstract, gp.program_name, gp.approval_date, gp.deadline, r.review_score, r.review_whom, r.review_date, r.feedback from applicantorganisation ao
+            (select ao.organisation_id id, ao.organisation_name, gp.program_description, gp.program_budget, gp.program_name, gp.approval_date, gp.deadline, r.review_score, r.review_whom, r.review_date, r.feedback from applicantorganisation ao
             inner join grantprogram gp on gp.organisation_id=ao.organisation_id
             inner join review r on gp.review_id=r.review_id) derived
-            where derived.id=${id};`}
+            where derived.id=${id};`
+            }
         }
         if(role=='reviewer'){query=`select * from
         (select gp.proposal_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, ao.abstract, gp.proposal_title, gp.required_budget, gp.project_description from applicantorganisation ao
         inner join grantproposal gp on ao.organisation_id=gp.organisation_id) derived;`}
         if(role=='funder'){query=`select * from
-        (select ao.program_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, gpo.program_name, gpo.program_budget, gpo.program_description, gpo.approval_date, gpo.deadline, gpo.progress from applicantorganisation ao
-        inner join grantprogram gpo on ao.program_id=gpo.program_id and gpo.funded_status='not_funded') derived;`}
+        (select gpo.program_id id, ao.organisation_name, ao.team_lead_fname, ao.team_lead_lname, gpo.program_name, gpo.program_budget, gpo.program_description, gpo.approval_date, gpo.deadline, gpo.progress from applicantorganisation ao
+        inner join grantprogram gpo on ao.organisation_id=gpo.organisation_id and gpo.funded_status='not_funded') derived;`}
         // const query = `SELECT * FROM ${table} WHERE ${table_id}=${id}`;
         const result = await axios.post(`http://localhost:3000/api/processQuery`, {
             headers: {
@@ -72,7 +83,31 @@ function roles(){
             console.log("get banished to homepage!")
             router.push(`http://localhost:3000`)
         }
+
+        if(viewFunder==='open'){
+            let funderQuery=`select grant_amount, funded_by_whom, fund_duration from fundedproject where program_id=${whichProgram};`
+            const viewFunderResult = await axios.post(`http://localhost:3000/api/processQuery`, {
+                headers: {
+                    "x-access-token": `${localStorage.getItem("token")}`
+                },
+                query: query,
+                id: id,
+                role: role})
+            if(viewFunderResult.data.auth){
+                console.log("view funder data now")
+                console.log(viewFunderResult.data.results)
+                setViewFunderResult(viewFunderResult.data.results)
+            } else {
+                console.log("view funder data wawawawa :(")
+            }
+         } //else {
+        //     funderQuery = "";
+        // }
+
+
     }
+
+
 
     const toggleActionState = ()=>{
         if(actionState==="+"){
@@ -88,6 +123,16 @@ function roles(){
         } else {
             setGrantType("proposal")
         }
+    }
+
+    const toggleViewFunder = (who)=>{
+        if(viewFunder==="open"){
+            setViewFunder("close")
+        } else {
+            setViewFunder("open")
+        }
+
+        setWhichProgram(who)
     }
 
     const setForeignKeyCheck = async(state)=>{
@@ -197,7 +242,7 @@ function roles(){
             console.log("reviewInfoQuery wawawawa :(")
         }
         
-        const insertGrantProgram = `insert into grantprogram(program_name, approval_date, deadline, progress, funded_status, organisation_id, review_id) values ('${proposalInfo['proposal_title']}', '2023-01-01', '2023-06-02','Pending','not_funded','${proposalInfo['organisation_id']}', ${proposalInfo['proposal_id']});`;
+        const insertGrantProgram = `insert into grantprogram(program_name, approval_date, deadline, progress, funded_status, organisation_id, review_id, program_budget, program_description) values ('${proposalInfo['proposal_title']}', '2023-01-01', '2023-06-02','Pending','not_funded','${proposalInfo['organisation_id']}', ${proposalInfo['proposal_id']}, ${proposalInfo['required_budget']}, '${proposalInfo['project_description']}');`;
         console.log(item_id);
         // const mergedquery = query.join(';')+";";
         await setForeignKeyCheck(0);
@@ -267,25 +312,35 @@ function roles(){
         {role === 'applicant' ? (
             <div>
                 <nav className="navbar-log">
-                    <div className="logo2">
+                    <img src="/GH.svg" alt="Your SVG" className="gh-svg" />
+                    <div className="logoo">
                         <h1>GrantHive</h1>
+                    </div>
+                    <div className='login'>
+                        <a href="/">
+                            Logout
+                        </a>
                     </div>
                 </nav>
                 <div>
                     <div className="user-greeting">Hello <span>{localStorage.getItem("loggedInUser")}</span>!</div>
+                    <img src="/form.svg" alt="Your SVG" className="form-svg" />
                     <button className="toggle-button" onClick={toggleActionState}>
                         {actionState}
                     </button>
+                   
+
+                    <img src="/app.svg" alt="Your SVG" className="app-svg" />
                 </div>
                 <div>
                     {actionState === "x" ? (
                         <div className="proposal-form">
-                            <div style={{ fontSize: '20px', textAlign: 'center', margin: '1% auto', fontWeight: 'bold', color:'#703131' }}>Create Grant Proposal</div>
-                            <div style={{ marginTop: '3%' }}>
-                                <div className="input-pair">
+                            <div style={{ fontSize: '20px', textAlign: 'center', margin: '2% auto', fontWeight: 'bold', color:'#703131' }}>Create Grant Proposal</div>
+                            <div style={{ marginTop: '4%' }}>
+                                <div className="input-pair" style={{ marginBottom: '-10px' }}>
                                     <div>Proposal Name :</div>
                                     <div>
-                                        <input type="text"
+                                        <input type="text" style={{padding:'3%'}}
                                         onChange={e => { setPfName(e.target.value) }}
                                         value={pfName}
                                         />
@@ -294,7 +349,7 @@ function roles(){
                                 <div className="input-pair">
                                     <div>Required Budget :</div>
                                     <div>
-                                        <input type="text"
+                                        <input type="text" style={{ padding: '3%' }}
                                         onChange={e => { setPfBudget(e.target.value) }}
                                         value={pfBudget}
                                         />
@@ -303,7 +358,7 @@ function roles(){
                                 <div className="input-pair">
                                     <div>Proposal Description :</div>
                                     <div>
-                                        <textarea rows="4" cols="30" style={{ border: '1px solid black' }}
+                                        <textarea rows="3" cols="30" style={{ padding:'3%' , border: '1px solid black' }}
                                         onChange={e => { setPfDesc(e.target.value) }}
                                         value={pfDesc}
                                         ></textarea>
@@ -337,10 +392,10 @@ function roles(){
                                         {queryResult.map((item, index) => (
                                             <div key={index} className="proposal-item">                                                
                                                 {/* <div className="hmm">Program ID: {item.program_id}</div> */}
-                                                <div className="hmm">Proposal ID: {item.proposal_id}</div>
-                                                <div className="hmm">Proposal Title: {item.proposal_title}</div>
-                                                <div className="hmm">Project Description: {item.project_description}</div>
-                                                <div className="hmm">Required Budget: {item.required_budget}</div>
+                                                <div className="hmm"><span className="oh">Proposal ID:</span> {item.proposal_id}</div>
+                                                <div className="hmm"><span className="oh">Proposal Title:</span> {item.proposal_title}</div>
+                                                <div className="hmm"><span className="oh">Project Description:</span> {item.project_description}</div>
+                                                <div className="hmm"><span className="oh">Required Budget:</span> {item.required_budget}</div>
                                             </div>
                                         ))}
                                     </div>
@@ -348,18 +403,29 @@ function roles(){
                                     <div>
                                         {queryResult.map((item, index) => (
                                             <div key={index} className="program-item1">
-                                                <div className="hmm">ID: {item.id}</div>
-                                                <div className="hmm">Abstract: {item.abstract}</div>
-                                                <div className="hmm">Grant Amount: {item.grant_amount}</div> 
-                                                <div className="hmm">Organisation Name: {item.organisation_name}</div>
-                                                <div className="hmm">Program Name: {item.program_name}</div>
-                                                <div className="hmm">Approval date: {item.approval_date}</div>
-                                                <div className="hmm">Feedback: {item.feedback}</div>
-                                                <div className="hmm">Deadline: {item.deadline}</div>
-                                                <div className="hmm">Review Date: {item.review_date}</div>
-                                                <div className="hmm">Reviewed By: {item.review_whom}</div>
-                                                <div className="hmm">Review Score: {item.review_score}</div>
-
+                                                <div className="arrange">
+                                                        <div className="left">
+                                                        <div className="hmm"><span className="oh">ID:</span> {item.id}</div>
+                                                        <div className="hmm"><span className="oh">Required Budget:</span> {item.program_budget}</div> 
+                                                        <div className="hmm"><span className="oh">Organisation Name:</span> {item.organisation_name}</div>
+                                                        <div className="hmm"><span className="oh">Program Name:</span> {item.program_name}</div>
+                                                        <div className="hmm"><span className="oh">Program Desc:</span> {item.program_description}</div>                                                
+                                                        <div className="hmm"><span className="oh">Feedback:</span> {item.feedback}</div>
+                                                    </div>
+                                                    <div className="right">
+                                                        <div className="hmm"><span className="oh">Approval Date:</span> {item.approval_date ? new Date(item.approval_date).toISOString().split('T')[0] : ''}</div>
+                                                        <div className="hmm"><span className="oh">Deadline:</span> {item.deadline ? new Date(item.deadline).toISOString().split('T')[0] : ''}</div>
+                                                        <div className="hmm"><span className="oh">Review Date:</span> {item.review_date ? new Date(item.review_date).toISOString().split('T')[0] : ''}</div>
+                                                        <div className="hmm"><span className="oh">Reviewed By:</span> {item.review_whom}</div>
+                                                        <div className="hmm"><span className="oh">Review Score:</span> {item.review_score}</div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    {/* <button className="view-funder" onClick={()=>{toggleViewFunder(item.id)}}>View Funders</button>
+                                                    <div>
+                                                        <div>use map and put funder detail here in a table</div>
+                                                    </div> */}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -374,47 +440,78 @@ function roles(){
 
         {role=='reviewer'?<div>
             <nav className='navbar-log'>
-                <div className="logo2">
+                <img src="/GH.svg" alt="Your SVG" className="gh-svg" />
+                <div className="logoo">
                     <h1>
                         GrantHive
                     </h1>
                 </div>
+                <div className='login'>
+                    <a href="/">
+                        Logout
+                    </a>
+                </div>
             </nav>
             <div>
-                <div className="user-greeting">Hello {localStorage.getItem("loggedInUser")}!</div>
+                <div className="user-greeting-rev">Hello {localStorage.getItem("loggedInUser")}!</div>
+                <img src="/rev.svg" alt="Your SVG" className="rev-svg" />
                 {/* <button onClick={toggleActionState}>{actionState}</button> */}
             </div> 
             <div className="rev-container">
                 {/* Display the program items with buttons on the right */}
                 <div className="rev-info">
+                <div className="rev-h">
+                    <div className="revtit">
+                        PENDING PROPOSAL(S) TO BE REVIEWED
+                    </div>
+                    <img src="/stars.svg" alt="Your SVG" className="stars-svg" />
+                    
+                </div>
                     {queryResult.map((item, index) => (
                         <div key={index} className="rev-item">
                             <div className="aa">
-                                <div className="hm">Proposal ID: {item.id}</div>
-                                <div className="hm">Proposal Title: {item.proposal_title}</div>
-                                <div className="hm">Organisation Name: {item.organisation_name}</div>
-                                <div className="hm">Team Leader: {item.team_lead_fname} {item.team_lead_lname}</div>
+                                <div className="hm"><span className="oh">Proposal ID:</span> {item.id}</div>
+                                <div className="hm"><span className="oh">Proposal Title:</span> {item.proposal_title}</div>
+                                <div className="hm"><span className="oh">Organisation Name:</span> {item.organisation_name}</div>
+                                <div className="hm"><span className="oh">Team Leader:</span> {item.team_lead_fname} {item.team_lead_lname}</div>
                                 {/* <div className="hm">Proposal ID: {item.id}</div> */}
-                                <div className="hm">Project Description: {item.project_description}</div>
-                                <div className="hm">Required Budget: {item.required_budget}</div>
+                                <div className="hm"><span className="oh">Project Description:</span> {item.project_description}</div>
+                                <div className="hm"><span className="oh">Required Budget:</span> {item.required_budget}</div>
                             </div>
                             <div className="rev-content">
                                 <div className="rev-details">
                                     <div className="rev-detail">
-                                        <label className="rev-lab" htmlFor="rating">Enter Rating</label>
-                                        <input type="number" id="rating" min="1" max="5" step="0.1"
-                                        onChange={e => { setRating(e.target.value) }}
-                                        value={rating}/>
+                                        <label className="rev-lab" htmlFor="rating">Enter Rating (0-5)</label>
+                                        <input
+                                            type="number"
+                                            id="rating"
+                                            min="1"
+                                            max="5"
+                                            step="0.5"
+                                            onChange={(e) => {
+                                                const inputValue = parseFloat(e.target.value);
+
+                                                // Check if the input value is greater than 5 and set it to 5 if it is.
+                                                if (inputValue > 5) {
+                                                    e.target.value = '5';
+                                                }
+
+                                                setRating(e.target.value);
+                                                setWhoChange(index);
+                                            }}
+                                            value={whoChange === index ? rating : ''}
+                                        />
+
                                     </div>
                                     <div>
-                                        <label>Enter Feedback</label>
+                                        <label style={{margin:'0 0 0 0px'}}>Enter Feedback</label>
                                         <input type="text"
-                                        onChange={e => { setFeedback(e.target.value); }}
-                                        value={feedback}/>
+                                        onChange={e => { setFeedback(e.target.value); setWhoChange(index) }}
+                                        value={whoChange===index?feedback:""}/>
                                     </div>
                                     <div className="rev-actions">
-                                        <button className="approve-button" onClick={()=>{approveProposal(item.id)}}>Approve</button>
-                                        <button className="reject-button" onClick={()=>{rejectProposal(item.id)}}>Reject</button>
+                                        <button className="approve-button" onClick={()=>{approveProposal(item.id);setWhoChange(-1)}}>Approve</button>
+                                        <button className="reject-button" onClick={()=>{rejectProposal(item.id);setWhoChange(-1)}}>Reject</button>
                                     </div>
                                 </div>
                             </div>
@@ -429,39 +526,56 @@ function roles(){
         {role === 'funder' ? (
             <div>
                 <nav className='navbar-log'>
-                    <div className="logo2">
+                    <img src="/GH.svg" alt="Your SVG" className="gh-svg" />
+                    <div className="logoo">
                         <h1>GrantHive</h1>
                     </div>
+                    <div className='login'>
+                        <a href="/">
+                            Logout
+                        </a>
+                    </div>
                 </nav>
+                
                 <div>
-                    <div className="user-greeting">Hello {localStorage.getItem("loggedInUser")}!</div>
+                    <div className="user-greeting-fund">Hello {localStorage.getItem("loggedInUser")}!</div>
+                    <img src="/fund.svg" alt="Your SVG" className="fund-svg" />
                 </div>
+                
+
                 <div className="grant-program-container">
                     {/* Display the program items with buttons on the right */}
                     <div className="grant-program-info">
+                        <div className="fundtit">
+                            PENDING PROGRAM(S) TO BE FUNDED
+                        </div>
+                        <img src="/mani.svg" alt="Your SVG" className="mani-svg" />
                         {queryResult.map((item, index) => (
                             <div key={index} className="program-item">
                                 <div className = "aa">
-                                <div className="hm">Program ID: {item.id}</div>
-                                <div className="hm">Organisation Name: {item.organisation_name}</div>
-                                <div className="hm">Team Leader: {item.team_lead_fname} {item.team_lead_lname}</div>
-                                <div className="hm">Program Name: {item.program_name}</div>                                                             
-                                <div className="hm">Current Required Budget: {item.program_budget}</div>
+                                    <div className="hm"><span className="oh">Program ID:</span> {item.id}</div>
+                                    <div className="hm"><span className="oh">Organisation Name:</span> {item.organisation_name}</div>
+                                    <div className="hm"><span className="oh">Team Leader:</span> {item.team_lead_fname} {item.team_lead_lname}</div>
+                                    <div className="hm"><span className="oh">Program Name:</span> {item.program_name}</div>                                                             
+                                    <div className="hm"><span className="oh">Current Required Budget:</span> {item.program_budget}</div>
                                 {/* <div className="hm">Abstract: {item.abstract}</div> */}
-                                <div className="hm">Project Description: {item.program_description}</div>
-                                <div className="hm">Approval Date: {item.approval_date}</div>
-                                <div className="hm">Deadline: {item.deadline}</div>
-                                <div className="hm">Progress: {item.progress}</div>
+                                    <div className="hm"><span className="oh">Project Description:</span> {item.program_description}</div>
+                                    <div className="hm"><span className="oh">Approval Date:</span> {item.approval_date ? new Date(item.approval_date).toISOString().split('T')[0] : ''}</div>
+                                    <div className="hm"><span className="oh">Deadline:</span> {item.deadline ? new Date(item.deadline).toISOString().split('T')[0] : ''}</div>
+                                    <div className="hm"><span className="oh">Progress:</span> {item.progress}</div>
                                 </div>
                                 <div className="grant-program-actions">
-                                    <button className="fund-button" onClick={() => { setFundOpen(!fundOpen) }}>Want to Fund?</button>
-                                    {fundOpen ? (
+                                    <button className="fund-button" onClick={() => { setFundOpen(!fundOpen); setWhoChange(index) }}>Want to Fund?</button>
+                                    {(fundOpen&&index===whoChange) ? (
                                         <div className="fund-form">
                                             <div className="set-amount-label">Set Amount</div>
                                             <div className="set-amount-input">
-                                                <input type="number" onChange={e => { setFundAmount(e.target.value) }} value={fundAmount}/>
+                                                <input type="number" 
+                                                onChange={e => { setFundAmount(e.target.value); setWhoChange(index) }}
+                                                value={whoChange===index?fundAmount:""}/>
                                             </div>
-                                            <button className="approve1-button" onClick={()=>{approveFunding(item.id, item.program_budget)}}>Approve</button>
+                                            <button className="approve1-button" onClick={()=>{approveFunding(item.id, item.program_budget);setWhoChange(-1)}}>Approve</button>
+                                            
                                         </div>
                                     ) : <div></div>}
                                 </div>
@@ -473,7 +587,8 @@ function roles(){
         ) : (
             <div></div>
         )}
-
+        
+        
 
     </div>)
 }
