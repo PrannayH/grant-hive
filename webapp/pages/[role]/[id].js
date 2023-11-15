@@ -55,7 +55,7 @@ function roles(){
             if(grantType==='proposal')
             {query=`select * from grantproposal where organisation_id=${id};`}
             else{query=`select * from
-            (select ao.organisation_id id, ao.organisation_name, gp.program_description, gp.program_budget, gp.program_name, gp.approval_date, gp.deadline, r.review_score, r.review_whom, r.review_date, r.feedback from applicantorganisation ao
+            (select ao.organisation_id id, gp.program_id, ao.organisation_name, gp.program_description, gp.program_budget, gp.program_name, gp.approval_date, gp.deadline, r.review_score, r.review_whom, r.review_date, r.feedback from applicantorganisation ao
             inner join grantprogram gp on gp.organisation_id=ao.organisation_id
             inner join review r on gp.review_id=r.review_id) derived
             where derived.id=${id};`
@@ -405,7 +405,7 @@ function roles(){
                                             <div key={index} className="program-item1">
                                                 <div className="arrange">
                                                         <div className="left">
-                                                        <div className="hmm"><span className="oh">ID:</span> {item.id}</div>
+                                                        <div className="hmm"><span className="oh">ID:</span> {item.program_id}</div>
                                                         <div className="hmm"><span className="oh">Required Budget:</span> {item.program_budget}</div> 
                                                         <div className="hmm"><span className="oh">Organisation Name:</span> {item.organisation_name}</div>
                                                         <div className="hmm"><span className="oh">Program Name:</span> {item.program_name}</div>

@@ -9,14 +9,22 @@ function loginPage(){
     const [uname, setUname] = useState();
     const [pword, setPword] = useState();
 
+    const [falseLogIn, setFalseLogIn] = useState();
+
     const submitLogin = async()=>{
         const result = await axios.post(`http://localhost:3000/api/login`, {'username': uname, 'password': pword});
         console.log("hmmm: "+result.data.auth);
         if(result.data.auth){
             localStorage.setItem("token", result.data.token);
             localStorage.setItem("loggedInUser", uname)
+            setFalseLogIn(false)
             console.log(`after login - http://localhost:3000/${result.data.result.user_role}/${result.data.result.role_id}`);
             router.push(`http://localhost:3000/${result.data.result.user_role}/${result.data.result.role_id}`)
+        } else {
+            setFalseLogIn(true)
+            setTimeout(()=>{
+                setFalseLogIn(false)
+            }, 3000)
         }
     }
 
@@ -55,6 +63,9 @@ function loginPage(){
                             value={pword}
                         />
                     </div>
+                    {falseLogIn===true?<div style={{color: "red", marginTop: "-20px", fontWeight: "600", fontSize: "14px"}}>
+                        Username or Password is Wrong!
+                    </div>:<div></div>}
                     <div className="formGroup">
                         <button className="loginButton" onClick={submitLogin}>Login</button>
                     </div>
