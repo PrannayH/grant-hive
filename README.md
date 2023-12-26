@@ -1,6 +1,34 @@
-# grant-hive
-"Granthive" is a Database Management System (DBMS) project built on MySQL, aimed at streamlining the funding process for students' projects. The project facilitates students in securing the necessary grants from diverse funding committees to successfully initiate and execute their projects. 
-In the Granthive system, an application organization collects project details from students and submits grant proposals. These proposals are then subject to review by a dedicated panel, receiving scores and feedback, ultimately transforming into grant programs. Subsequently, funding committees evaluate the grant programs and allocate grants to support the selected projects.
-The Granthive database encompasses several entities, including the application organization, grant proposal, grant program, review panel, and funded projects, each with relevant attributes and established relational and referential constraints that interconnect these entities.
-To provide an accessible and user-friendly interface for this process, a website will be developed. This website will display the database's content and allow users to execute complex queries, simplifying the management and accessibility of critical information for all stakeholders involved in the grant allocation process. 
-Granthive represents an efficient and comprehensive solution to streamline the grant application and allocation process, benefiting both students and funding committees alike.
+# Granthive: Streamlining Grant Management for Student Projects
+
+## Overview
+
+"Granthive" is a Database Management System (DBMS) project built on MySQL, dedicated to enhancing the funding process for students' projects. The system aims to streamline the grant application and allocation process, making it efficient and accessible for both students and funding committees.
+
+## Features
+
+- **User-Friendly Interface:** Granthive provides a web-based interface to facilitate easy interaction with the system. Users can submit grant proposals, review panel members can evaluate proposals, and funding committees can allocate grants.
+
+- **Entity Structure:** The Granthive database comprises several entities, including the application organization, grant proposal, grant program, review panel, and funded projects. Each entity is designed with relevant attributes and establishes relational and referential constraints to maintain a coherent and interconnected data structure.
+
+- **Grant Application Workflow:** The system follows a structured workflow where the application organization collects project details from students, submits grant proposals, and a dedicated panel reviews and scores the proposals. Successful proposals transform into grant programs, and funding committees evaluate and allocate grants to support selected projects.
+
+- **Query Execution:** Granthive enables users to execute complex queries through the website, providing a means to manage and access critical information. This feature enhances the overall efficiency of the grant allocation process.
+
+## Getting Started
+
+To set up and run Granthive locally, follow these steps:
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/your-username/grant-hive.git
+   ```
+
+2. **Database Configuration:**
+   - Set up a MySQL database and configure the connection details in the project.
+
+3. **Web Interface:**
+   - Develop and deploy the website to provide users with a seamless interface for interacting with Granthive.
+
+4. **Execute Queries:**
+   - Ensure that the query execution functionality is properly implemented and allows users to access and manage information effectively.
+
